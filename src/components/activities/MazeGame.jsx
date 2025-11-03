@@ -3,12 +3,11 @@ import './MazeGame.css'
 import { soundManager } from '../../utils/sounds'
 import CodeBlocks from '../CodeBlocks'
 
-const MazeGame = ({ theme, soundEnabled }) => {
+const MazeGame = ({ theme, soundEnabled, onScoreUpdate }) => {
   const [playerPos, setPlayerPos] = useState({ x: 0, y: 0 })
   const [goalPos] = useState({ x: 4, y: 4 })
   const [commands, setCommands] = useState([])
   const [isRunning, setIsRunning] = useState(false)
-  const [score, setScore] = useState(0)
   const [isComplete, setIsComplete] = useState(false)
 
   // Simple maze - 0 = path, 1 = wall
@@ -72,7 +71,7 @@ const MazeGame = ({ theme, soundEnabled }) => {
       // Check if reached goal
       if (x === goalPos.x && y === goalPos.y) {
         setIsComplete(true)
-        setScore(prev => prev + 200)
+        if (onScoreUpdate) onScoreUpdate(200)
         if (soundEnabled) soundManager.levelUp()
         break
       }
@@ -92,9 +91,6 @@ const MazeGame = ({ theme, soundEnabled }) => {
       <div className="maze-header">
         <h2 style={{ color: theme.secondaryColor }}>🌌 Labirent Oyunu</h2>
         <p style={{ color: theme.primaryColor }}>Hedefe ulaş!</p>
-        <div className="maze-score" style={{ borderColor: theme.primaryColor }}>
-          ⭐ Puan: {score}
-        </div>
       </div>
 
       <div className="maze-container">

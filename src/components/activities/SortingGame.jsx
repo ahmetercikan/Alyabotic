@@ -2,12 +2,11 @@ import { useState, useEffect } from 'react'
 import './SortingGame.css'
 import { soundManager } from '../../utils/sounds'
 
-const SortingGame = ({ theme, soundEnabled }) => {
+const SortingGame = ({ theme, soundEnabled, onScoreUpdate }) => {
   const [items, setItems] = useState([])
   const [sortedItems, setSortedItems] = useState([])
   const [selectedItem, setSelectedItem] = useState(null)
   const [isComplete, setIsComplete] = useState(false)
-  const [score, setScore] = useState(0)
 
   // Generate random items to sort
   useEffect(() => {
@@ -34,15 +33,25 @@ const SortingGame = ({ theme, soundEnabled }) => {
     if (isComplete) return
 
     if (selectedItem === null) {
+      // First click - select item
       setSelectedItem(item)
       if (soundEnabled) soundManager.collect()
+    } else if (selectedItem.value === item.value) {
+      // Clicking same item - deselect
+      setSelectedItem(null)
     } else {
-      // Swap items
+      // Second click - swap items
       const newItems = [...items]
       const idx1 = newItems.findIndex(i => i.value === selectedItem.value)
       const idx2 = newItems.findIndex(i => i.value === item.value)
 
-      [newItems[idx1], newItems[idx2]] = [newItems[idx2], newItems[idx1]]
+      // Swap the items
+      const temp = newItems[idx1]
+      newItems[idx1] = newItems[idx2]
+      newItems[idx2] = temp
+
+      console.log('Swapping:', selectedItem.value, 'with', item.value)
+      console.log('New order:', newItems.map(i => i.value))
 
       setItems(newItems)
       setSelectedItem(null)
@@ -51,9 +60,11 @@ const SortingGame = ({ theme, soundEnabled }) => {
 
       // Check if sorted
       const isSorted = newItems.every((item, index) => item.value === index + 1)
+      console.log('Is sorted?', isSorted)
+
       if (isSorted) {
         setIsComplete(true)
-        setScore(prev => prev + 100)
+        if (onScoreUpdate) onScoreUpdate(100)
         if (soundEnabled) soundManager.levelUp()
       }
     }
@@ -72,9 +83,6 @@ const SortingGame = ({ theme, soundEnabled }) => {
         <p style={{ color: theme.primaryColor }}>
           Sayıları küçükten büyüğe sırala!
         </p>
-        <div className="sorting-score" style={{ borderColor: theme.primaryColor }}>
-          ⭐ Puan: {score}
-        </div>
       </div>
 
       <div className="sorting-container">

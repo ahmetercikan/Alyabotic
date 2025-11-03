@@ -257,15 +257,19 @@ function App() {
     )
   }
 
+  const handleScoreUpdate = (points) => {
+    setScore(prev => prev + points)
+  }
+
   // Render specific activity
   const renderActivity = () => {
     switch (selectedActivity.type) {
       case activityTypes.SORTING:
-        return <SortingGame theme={currentTheme} soundEnabled={soundEnabled} />
+        return <SortingGame theme={currentTheme} soundEnabled={soundEnabled} onScoreUpdate={handleScoreUpdate} />
       case activityTypes.PATTERN:
-        return <PatternGame theme={currentTheme} soundEnabled={soundEnabled} />
+        return <PatternGame theme={currentTheme} soundEnabled={soundEnabled} onScoreUpdate={handleScoreUpdate} />
       case activityTypes.MAZE:
-        return <MazeGame theme={currentTheme} soundEnabled={soundEnabled} />
+        return <MazeGame theme={currentTheme} soundEnabled={soundEnabled} onScoreUpdate={handleScoreUpdate} />
       case activityTypes.GRID_MOVEMENT:
       default:
         // Original grid movement game
@@ -349,6 +353,12 @@ function App() {
         <h1 className="app-title">🎮 ALYABOTIC 🎮</h1>
         <p className="app-subtitle">{currentTheme.name} - {selectedActivity.name}</p>
         <div className="stats">
+          <div className="stat" style={{ borderColor: currentTheme.secondaryColor }}>
+            ⭐ Puan: {score}
+          </div>
+          <div className="stat" style={{ borderColor: currentTheme.secondaryColor }}>
+            🎯 Seviye: {level}
+          </div>
           <button
             className="theme-change-btn"
             onClick={handleChangeActivity}
@@ -356,7 +366,7 @@ function App() {
               background: `linear-gradient(135deg, ${currentTheme.primaryColor} 0%, ${currentTheme.secondaryColor} 100%)`
             }}
           >
-            🔙 Aktivite Değiştir
+            🔙 Aktivite
           </button>
           <button
             className="theme-change-btn"
@@ -365,7 +375,7 @@ function App() {
               background: `linear-gradient(135deg, ${currentTheme.primaryColor} 0%, ${currentTheme.secondaryColor} 100%)`
             }}
           >
-            🔄 Tema Değiştir
+            🔄 Tema
           </button>
           <button
             className="sound-toggle-btn"
@@ -374,7 +384,7 @@ function App() {
               background: `linear-gradient(135deg, ${currentTheme.primaryColor} 0%, ${currentTheme.secondaryColor} 100%)`
             }}
           >
-            {soundEnabled ? '🔊 Ses Açık' : '🔇 Ses Kapalı'}
+            {soundEnabled ? '🔊' : '🔇'}
           </button>
         </div>
       </header>

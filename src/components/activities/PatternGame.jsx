@@ -2,10 +2,9 @@ import { useState, useEffect } from 'react'
 import './PatternGame.css'
 import { soundManager } from '../../utils/sounds'
 
-const PatternGame = ({ theme, soundEnabled }) => {
+const PatternGame = ({ theme, soundEnabled, onScoreUpdate }) => {
   const [pattern, setPattern] = useState([])
   const [options, setOptions] = useState([])
-  const [score, setScore] = useState(0)
   const [feedback, setFeedback] = useState(null)
 
   const shapes = ['🔵', '🔴', '🟢', '🟡', '🟣', '🟠']
@@ -45,7 +44,7 @@ const PatternGame = ({ theme, soundEnabled }) => {
 
     if (option === correctAnswer) {
       setFeedback('correct')
-      setScore(prev => prev + 50)
+      if (onScoreUpdate) onScoreUpdate(50)
       if (soundEnabled) soundManager.success()
 
       setTimeout(() => {
@@ -70,9 +69,6 @@ const PatternGame = ({ theme, soundEnabled }) => {
         <p style={{ color: theme.primaryColor }}>
           Desenin son parçasını bul!
         </p>
-        <div className="pattern-score" style={{ borderColor: theme.primaryColor }}>
-          ⭐ Puan: {score}
-        </div>
       </div>
 
       <div className="pattern-container">
