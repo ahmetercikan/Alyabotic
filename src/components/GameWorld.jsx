@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react'
 import './GameWorld.css'
 
-const GameWorld = ({ characterPosition, level, theme }) => {
+const GameWorld = ({ characterPosition, level, theme, collectedObjects = [] }) => {
   const [objects, setObjects] = useState([])
+  const [collectingAt, setCollectingAt] = useState(null)
   const gridSize = 5
 
   useEffect(() => {
@@ -35,12 +36,22 @@ const GameWorld = ({ characterPosition, level, theme }) => {
     setObjects(newObjects)
   }, [level, theme])
 
+  // Show collection animation when objects are collected
+  useEffect(() => {
+    if (collectedObjects.length > 0) {
+      const lastCollected = collectedObjects[collectedObjects.length - 1]
+      setCollectingAt({ x: lastCollected.x, y: lastCollected.y })
+      setTimeout(() => setCollectingAt(null), 500)
+    }
+  }, [collectedObjects])
+
   const renderGrid = () => {
     const grid = []
     for (let y = 0; y < gridSize; y++) {
       for (let x = 0; x < gridSize; x++) {
         const isCharacter = characterPosition.x === x && characterPosition.y === y
         const object = objects.find(o => o.x === x && o.y === y)
+        const isCollecting = collectingAt && collectingAt.x === x && collectingAt.y === y
 
         let cellClass = 'grid-cell'
         let cellContent = <div className="empty-cell">✨</div>
@@ -53,9 +64,20 @@ const GameWorld = ({ characterPosition, level, theme }) => {
           cellContent = <div className={`object-sprite ${object.type}-sprite`}>{object.emoji}</div>
         }
 
+        if (isCollecting) {
+          cellClass += ' collecting'
+        }
+
         grid.push(
           <div key={`${x}-${y}`} className={cellClass}>
             {cellContent}
+            {isCollecting && (
+              <div className="collection-effect">
+                <div className="sparkle">✨</div>
+                <div className="sparkle">⭐</div>
+                <div className="sparkle">💫</div>
+              </div>
+            )}
           </div>
         )
       }

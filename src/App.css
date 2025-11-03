@@ -59,7 +59,8 @@
   border: 2px solid #A78BFA;
 }
 
-.theme-change-btn {
+.theme-change-btn,
+.sound-toggle-btn {
   padding: 10px 20px;
   font-size: 1rem;
   border: none;
@@ -71,12 +72,14 @@
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
 }
 
-.theme-change-btn:hover {
+.theme-change-btn:hover,
+.sound-toggle-btn:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
 }
 
-.theme-change-btn:active {
+.theme-change-btn:active,
+.sound-toggle-btn:active {
   transform: translateY(0);
 }
 

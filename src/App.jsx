@@ -5,7 +5,9 @@ import GameWorld from './components/GameWorld'
 import Character from './components/Character'
 import LevelSystem from './components/LevelSystem'
 import ThemeSelector from './components/ThemeSelector'
+import LevelUpCelebration from './components/LevelUpCelebration'
 import { themes } from './themes/themeConfig'
+import { soundManager } from './utils/sounds'
 
 function App() {
   const [selectedTheme, setSelectedTheme] = useState(null)
@@ -16,6 +18,9 @@ function App() {
   const [level, setLevel] = useState(1)
   const [collectedDemons, setCollectedDemons] = useState(0)
   const [currentCommandIndex, setCurrentCommandIndex] = useState(-1)
+  const [showLevelUp, setShowLevelUp] = useState(false)
+  const [soundEnabled, setSoundEnabled] = useState(true)
+  const [collectedObjects, setCollectedObjects] = useState([])
 
   const handleAddCommand = (command) => {
     setCommands([...commands, command])
@@ -45,6 +50,18 @@ function App() {
     setScore(0)
     setLevel(1)
     setCollectedDemons(0)
+    setCollectedObjects([])
+  }
+
+  const handleLevelUp = (newLevel) => {
+    if (soundEnabled) {
+      soundManager.levelUp()
+    }
+    setShowLevelUp(true)
+  }
+
+  const handleCloseCelebration = () => {
+    setShowLevelUp(false)
   }
 
   const executeCommand = async (command, position, commandIndex) => {
@@ -56,15 +73,19 @@ function App() {
     switch(command.type) {
       case 'move-up':
         newY = Math.max(0, newY - 1)
+        if (soundEnabled) soundManager.move()
         break
       case 'move-down':
         newY = Math.min(4, newY + 1)
+        if (soundEnabled) soundManager.move()
         break
       case 'move-left':
         newX = Math.max(0, newX - 1)
+        if (soundEnabled) soundManager.move()
         break
       case 'move-right':
         newX = Math.min(4, newX + 1)
+        if (soundEnabled) soundManager.move()
         break
       case 'jump':
       case 'warp-jump':
@@ -79,10 +100,12 @@ function App() {
           else if (lastCmd.type === 'move-left') newX = Math.max(0, newX - 2)
           else if (lastCmd.type === 'move-right') newX = Math.min(4, newX + 2)
         }
+        if (soundEnabled) soundManager.jump()
         break
       case 'teleport':
         newX = 2
         newY = 2
+        if (soundEnabled) soundManager.teleport()
         break
       default:
         // Handle all theme-specific actions dynamically
@@ -91,6 +114,22 @@ function App() {
           setScore(prev => prev + action.points)
           if (action.points > 0) {
             setCollectedDemons(prev => prev + 1)
+            setCollectedObjects(prev => [...prev, { x: newX, y: newY, type: command.type }])
+            if (soundEnabled) {
+              if (command.type === 'catch-demon' || command.type === 'catch-alien' ||
+                  command.type === 'catch-fish' || command.type === 'collect-fruit' ||
+                  command.type === 'collect-screw') {
+                soundManager.collect()
+              } else if (command.type === 'cast-spell' || command.type === 'laser-beam' ||
+                         command.type === 'sonar-wave' || command.type === 'nature-power' ||
+                         command.type === 'build-code') {
+                soundManager.castSpell()
+              } else if (command.type === 'destroy-wall' || command.type === 'destroy-meteor' ||
+                         command.type === 'destroy-rock' || command.type === 'destroy-thorn' ||
+                         command.type === 'debug-error') {
+                soundManager.destroy()
+              }
+            }
           }
           shouldAnimate = false
         }
@@ -154,6 +193,11 @@ function App() {
     setCharacterPosition({ x: 0, y: 0 })
     setCommands([])
     setIsRunning(false)
+    setCollectedObjects([])
+  }
+
+  const toggleSound = () => {
+    setSoundEnabled(!soundEnabled)
   }
 
   if (!selectedTheme) {
@@ -186,6 +230,15 @@ function App() {
           >
             🔄 Tema Değiştir
           </button>
+          <button
+            className="sound-toggle-btn"
+            onClick={toggleSound}
+            style={{
+              background: `linear-gradient(135deg, ${currentTheme.primaryColor} 0%, ${currentTheme.secondaryColor} 100%)`
+            }}
+          >
+            {soundEnabled ? '🔊 Ses Açık' : '🔇 Ses Kapalı'}
+          </button>
         </div>
       </header>
 
@@ -196,6 +249,7 @@ function App() {
             characterPosition={characterPosition}
             level={level}
             theme={currentTheme}
+            collectedObjects={collectedObjects}
           />
           <div className="controls">
             <button
@@ -262,7 +316,16 @@ function App() {
         level={level}
         score={score}
         onLevelChange={setLevel}
+        onLevelUp={handleLevelUp}
       />
+
+      {showLevelUp && (
+        <LevelUpCelebration
+          level={level}
+          onClose={handleCloseCelebration}
+          theme={currentTheme}
+        />
+      )}
     </div>
   )
 }

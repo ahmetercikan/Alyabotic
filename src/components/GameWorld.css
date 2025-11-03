@@ -129,6 +129,69 @@
   animation: bounce 0.5s ease-in-out;
 }
 
+.grid-cell.collecting {
+  animation: collect-flash 0.5s ease-in-out;
+}
+
+@keyframes collect-flash {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 20px #FCD34D;
+  }
+  50% {
+    transform: scale(1.2);
+    box-shadow: 0 0 40px #FCD34D, 0 0 60px #FBBF24;
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 20px #FCD34D;
+  }
+}
+
+.collection-effect {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.sparkle {
+  position: absolute;
+  font-size: 1.5rem;
+  animation: sparkle-burst 0.5s ease-out forwards;
+}
+
+.sparkle:nth-child(1) {
+  top: 50%;
+  left: 50%;
+  animation-delay: 0s;
+}
+
+.sparkle:nth-child(2) {
+  top: 50%;
+  left: 50%;
+  animation-delay: 0.1s;
+}
+
+.sparkle:nth-child(3) {
+  top: 50%;
+  left: 50%;
+  animation-delay: 0.2s;
+}
+
+@keyframes sparkle-burst {
+  0% {
+    transform: translate(-50%, -50%) scale(0) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -150%) scale(1.5) rotate(360deg);
+    opacity: 0;
+  }
+}
+
 @media (max-width: 768px) {
   .grid {
     grid-template-columns: repeat(5, 55px);
