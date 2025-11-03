@@ -5,12 +5,20 @@ import GameWorld from './components/GameWorld'
 import Character from './components/Character'
 import LevelSystem from './components/LevelSystem'
 import ThemeSelector from './components/ThemeSelector'
+import ActivitySelector from './components/ActivitySelector'
 import LevelUpCelebration from './components/LevelUpCelebration'
 import { themes } from './themes/themeConfig'
 import { soundManager } from './utils/sounds'
+import { getThemeActivities, activityTypes } from './activities/activityConfig'
+
+// Activity components
+import SortingGame from './components/activities/SortingGame'
+import PatternGame from './components/activities/PatternGame'
+import MazeGame from './components/activities/MazeGame'
 
 function App() {
   const [selectedTheme, setSelectedTheme] = useState(null)
+  const [selectedActivity, setSelectedActivity] = useState(null)
   const [commands, setCommands] = useState([])
   const [isRunning, setIsRunning] = useState(false)
   const [characterPosition, setCharacterPosition] = useState({ x: 0, y: 0 })
@@ -36,6 +44,7 @@ function App() {
 
   const handleThemeSelect = (themeId) => {
     setSelectedTheme(themeId)
+    setSelectedActivity(null)
     setCommands([])
     setCharacterPosition({ x: 0, y: 0 })
     setScore(0)
@@ -43,14 +52,27 @@ function App() {
     setCollectedDemons(0)
   }
 
+  const handleActivitySelect = (activity) => {
+    setSelectedActivity(activity)
+    setCommands([])
+    setCharacterPosition({ x: 0, y: 0 })
+  }
+
   const handleChangeTheme = () => {
     setSelectedTheme(null)
+    setSelectedActivity(null)
     setCommands([])
     setCharacterPosition({ x: 0, y: 0 })
     setScore(0)
     setLevel(1)
     setCollectedDemons(0)
     setCollectedObjects([])
+  }
+
+  const handleChangeActivity = () => {
+    setSelectedActivity(null)
+    setCommands([])
+    setCharacterPosition({ x: 0, y: 0 })
   }
 
   const handleLevelUp = (newLevel) => {
@@ -179,6 +201,8 @@ function App() {
       newX = result.x
       newY = result.y
 
+      console.log(`Command: ${command.type}, New Position: (${newX}, ${newY})`)
+
       // Always update character position to show movement
       setCharacterPosition({ x: newX, y: newY })
 
@@ -206,22 +230,134 @@ function App() {
   }
 
   const currentTheme = themes[selectedTheme]
+  const themeActivities = getThemeActivities(selectedTheme)
+
+  if (!selectedActivity) {
+    return (
+      <div className="app" style={{ background: currentTheme.background }}>
+        <header className="app-header" style={{ borderColor: currentTheme.primaryColor }}>
+          <h1 className="app-title">🎮 ALYABOTIC 🎮</h1>
+          <p className="app-subtitle">{currentTheme.name}</p>
+          <button
+            className="theme-change-btn"
+            onClick={handleChangeTheme}
+            style={{
+              background: `linear-gradient(135deg, ${currentTheme.primaryColor} 0%, ${currentTheme.secondaryColor} 100%)`
+            }}
+          >
+            🔄 Tema Değiştir
+          </button>
+        </header>
+        <ActivitySelector
+          activities={themeActivities}
+          onSelectActivity={handleActivitySelect}
+          theme={currentTheme}
+        />
+      </div>
+    )
+  }
+
+  // Render specific activity
+  const renderActivity = () => {
+    switch (selectedActivity.type) {
+      case activityTypes.SORTING:
+        return <SortingGame theme={currentTheme} soundEnabled={soundEnabled} />
+      case activityTypes.PATTERN:
+        return <PatternGame theme={currentTheme} soundEnabled={soundEnabled} />
+      case activityTypes.MAZE:
+        return <MazeGame theme={currentTheme} soundEnabled={soundEnabled} />
+      case activityTypes.GRID_MOVEMENT:
+      default:
+        // Original grid movement game
+        return (
+          <div className="game-container">
+            <div className="left-panel" style={{ borderColor: currentTheme.primaryColor }}>
+              <h2 style={{ color: currentTheme.secondaryColor }}>🎮 Oyun Dünyası</h2>
+              <GameWorld
+                characterPosition={characterPosition}
+                level={level}
+                theme={currentTheme}
+                collectedObjects={collectedObjects}
+              />
+              <div className="controls">
+                <button
+                  className="btn btn-run"
+                  onClick={handleRunCode}
+                  disabled={isRunning || commands.length === 0}
+                >
+                  ▶️ Kodları Çalıştır
+                </button>
+                <button
+                  className="btn btn-reset"
+                  onClick={handleReset}
+                  disabled={isRunning}
+                >
+                  🔄 Sıfırla
+                </button>
+              </div>
+            </div>
+
+            <div className="right-panel" style={{ borderColor: currentTheme.primaryColor }}>
+              <h2 style={{ color: currentTheme.secondaryColor }}>🧩 Kod Blokları</h2>
+              <CodeBlocks
+                onAddCommand={handleAddCommand}
+                disabled={isRunning}
+                theme={currentTheme}
+              />
+
+              <h2>📜 Komut Listesi</h2>
+              <div className="command-list">
+                {commands.length === 0 ? (
+                  <p className="empty-message">Kod blokları ekle!</p>
+                ) : (
+                  commands.map((cmd, index) => (
+                    <div
+                      key={index}
+                      className={`command-item ${currentCommandIndex === index ? 'executing' : ''}`}
+                    >
+                      <span className="command-number">{index + 1}.</span>
+                      <span>{cmd.label}</span>
+                      <button
+                        onClick={() => handleRemoveCommand(index)}
+                        disabled={isRunning}
+                        className="btn-remove"
+                      >
+                        ❌
+                      </button>
+                    </div>
+                  ))
+                )}
+              </div>
+              {commands.length > 0 && (
+                <button
+                  className="btn btn-clear"
+                  onClick={handleClearCommands}
+                  disabled={isRunning}
+                >
+                  🗑️ Tümünü Temizle
+                </button>
+              )}
+            </div>
+          </div>
+        )
+    }
+  }
 
   return (
     <div className="app" style={{ background: currentTheme.background }}>
       <header className="app-header" style={{ borderColor: currentTheme.primaryColor }}>
         <h1 className="app-title">🎮 ALYABOTIC 🎮</h1>
-        <p className="app-subtitle">{currentTheme.name}</p>
+        <p className="app-subtitle">{currentTheme.name} - {selectedActivity.name}</p>
         <div className="stats">
-          <div className="stat" style={{ borderColor: currentTheme.secondaryColor }}>
-            ⭐ Puan: {score}
-          </div>
-          <div className="stat" style={{ borderColor: currentTheme.secondaryColor }}>
-            🎯 Seviye: {level}
-          </div>
-          <div className="stat" style={{ borderColor: currentTheme.secondaryColor }}>
-            {currentTheme.character} Toplanan: {collectedDemons}
-          </div>
+          <button
+            className="theme-change-btn"
+            onClick={handleChangeActivity}
+            style={{
+              background: `linear-gradient(135deg, ${currentTheme.primaryColor} 0%, ${currentTheme.secondaryColor} 100%)`
+            }}
+          >
+            🔙 Aktivite Değiştir
+          </button>
           <button
             className="theme-change-btn"
             onClick={handleChangeTheme}
@@ -243,75 +379,7 @@ function App() {
         </div>
       </header>
 
-      <div className="game-container">
-        <div className="left-panel" style={{ borderColor: currentTheme.primaryColor }}>
-          <h2 style={{ color: currentTheme.secondaryColor }}>🎮 Oyun Dünyası</h2>
-          <GameWorld
-            characterPosition={characterPosition}
-            level={level}
-            theme={currentTheme}
-            collectedObjects={collectedObjects}
-          />
-          <div className="controls">
-            <button
-              className="btn btn-run"
-              onClick={handleRunCode}
-              disabled={isRunning || commands.length === 0}
-            >
-              ▶️ Kodları Çalıştır
-            </button>
-            <button
-              className="btn btn-reset"
-              onClick={handleReset}
-              disabled={isRunning}
-            >
-              🔄 Sıfırla
-            </button>
-          </div>
-        </div>
-
-        <div className="right-panel" style={{ borderColor: currentTheme.primaryColor }}>
-          <h2 style={{ color: currentTheme.secondaryColor }}>🧩 Kod Blokları</h2>
-          <CodeBlocks
-            onAddCommand={handleAddCommand}
-            disabled={isRunning}
-            theme={currentTheme}
-          />
-
-          <h2>📜 Komut Listesi</h2>
-          <div className="command-list">
-            {commands.length === 0 ? (
-              <p className="empty-message">Kod blokları ekle!</p>
-            ) : (
-              commands.map((cmd, index) => (
-                <div
-                  key={index}
-                  className={`command-item ${currentCommandIndex === index ? 'executing' : ''}`}
-                >
-                  <span className="command-number">{index + 1}.</span>
-                  <span>{cmd.label}</span>
-                  <button
-                    onClick={() => handleRemoveCommand(index)}
-                    disabled={isRunning}
-                    className="btn-remove"
-                  >
-                    ❌
-                  </button>
-                </div>
-              ))
-            )}
-          </div>
-          {commands.length > 0 && (
-            <button
-              className="btn btn-clear"
-              onClick={handleClearCommands}
-              disabled={isRunning}
-            >
-              🗑️ Tümünü Temizle
-            </button>
-          )}
-        </div>
-      </div>
+      {renderActivity()}
 
       <LevelSystem
         level={level}

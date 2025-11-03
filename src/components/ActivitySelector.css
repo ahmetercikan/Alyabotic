@@ -1,0 +1,118 @@
+.activity-selector {
+  padding: 40px 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.activity-title {
+  font-size: 3rem;
+  text-align: center;
+  margin-bottom: 40px;
+  text-shadow: 0 0 20px rgba(139, 92, 246, 0.5);
+}
+
+.activities-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 30px;
+  padding: 20px;
+}
+
+.activity-card {
+  background: rgba(255, 255, 255, 0.1);
+  border: 3px solid;
+  border-radius: 20px;
+  padding: 30px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+}
+
+.activity-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+}
+
+.activity-icon {
+  font-size: 5rem;
+  margin-bottom: 20px;
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.activity-name {
+  font-size: 1.8rem;
+  margin-bottom: 15px;
+  color: #fff;
+}
+
+.activity-description {
+  font-size: 1.1rem;
+  color: #C4B5FD;
+  margin-bottom: 25px;
+  line-height: 1.6;
+}
+
+.activity-start-btn {
+  padding: 15px 40px;
+  font-size: 1.2rem;
+  border: none;
+  border-radius: 12px;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  text-transform: uppercase;
+}
+
+.activity-start-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+}
+
+.activity-start-btn:active {
+  transform: scale(0.98);
+}
+
+@media (max-width: 768px) {
+  .activity-title {
+    font-size: 2rem;
+  }
+
+  .activities-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+    padding: 10px;
+  }
+
+  .activity-card {
+    padding: 25px;
+  }
+
+  .activity-icon {
+    font-size: 4rem;
+  }
+
+  .activity-name {
+    font-size: 1.5rem;
+  }
+
+  .activity-description {
+    font-size: 1rem;
+  }
+
+  .activity-start-btn {
+    padding: 12px 30px;
+    font-size: 1rem;
+  }
+}

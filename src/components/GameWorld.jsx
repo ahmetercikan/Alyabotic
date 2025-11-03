@@ -53,6 +53,7 @@ const GameWorld = ({ characterPosition, level, theme, collectedObjects = [] }) =
 
   const renderGrid = () => {
     const grid = []
+    console.log('Character Position:', characterPosition)
     for (let y = 0; y < gridSize; y++) {
       for (let x = 0; x < gridSize; x++) {
         const isCharacter = characterPosition.x === x && characterPosition.y === y
@@ -63,6 +64,7 @@ const GameWorld = ({ characterPosition, level, theme, collectedObjects = [] }) =
         let cellContent = <div className="empty-cell">✨</div>
 
         if (isCharacter) {
+          console.log(`Character found at grid position (${x}, ${y})`)
           cellClass += ' character'
           cellContent = (
             <div
