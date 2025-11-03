@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alyabotic İkon Oluşturucu</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #1a0033;
+            color: white;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 15px;
+            border: 2px solid #8B5CF6;
+        }
+        h1 {
+            color: #8B5CF6;
+            text-align: center;
+        }
+        canvas {
+            display: none;
+        }
+        .preview {
+            text-align: center;
+            margin: 20px 0;
+        }
+        .preview img {
+            border: 2px solid #8B5CF6;
+            border-radius: 10px;
+            margin: 10px;
+        }
+        button {
+            background: linear-gradient(135deg, #8B5CF6 0%, #EC4899 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 10px;
+            font-weight: bold;
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(139, 92, 246, 0.5);
+        }
+        .buttons {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .info {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎨 Alyabotic İkon Oluşturucu</h1>
+
+        <div class="info">
+            <p><strong>Talimatlar:</strong></p>
+            <ol>
+                <li>Bu sayfayı tarayıcınızda açın</li>
+                <li>"İkonları Oluştur" butonuna tıklayın</li>
+                <li>Her ikonu sağ tıklayıp "Resmi farklı kaydet" yapın</li>
+                <li>Dosyaları <code>public/</code> klasörüne kaydedin</li>
+            </ol>
+        </div>
+
+        <div class="buttons">
+            <button onclick="generateIcons()">🚀 İkonları Oluştur</button>
+        </div>
+
+        <div class="preview" id="preview"></div>
+    </div>
+
+    <canvas id="canvas"></canvas>
+
+    <script>
+        function generateIcons() {
+            const sizes = [72, 96, 128, 144, 152, 192, 384, 512];
+            const preview = document.getElementById('preview');
+            preview.innerHTML = '<h2>İkonlar Oluşturuldu!</h2><p>Her ikonu sağ tıklayıp kaydedin:</p>';
+
+            sizes.forEach(size => {
+                const canvas = document.createElement('canvas');
+                canvas.width = size;
+                canvas.height = size;
+                const ctx = canvas.getContext('2d');
+
+                // Background gradient
+                const gradient = ctx.createLinearGradient(0, 0, size, size);
+                gradient.addColorStop(0, '#8B5CF6');
+                gradient.addColorStop(0.5, '#EC4899');
+                gradient.addColorStop(1, '#F59E0B');
+
+                // Draw circle background
+                ctx.fillStyle = gradient;
+                ctx.beginPath();
+                ctx.arc(size/2, size/2, size/2 - 10, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Draw robot icon
+                ctx.fillStyle = 'white';
+
+                // Head
+                const headSize = size * 0.3;
+                const headX = size/2 - headSize/2;
+                const headY = size * 0.23;
+                roundRect(ctx, headX, headY, headSize, headSize * 0.8, 10);
+                ctx.fill();
+
+                // Eyes
+                ctx.fillStyle = '#8B5CF6';
+                ctx.beginPath();
+                ctx.arc(size * 0.4, size * 0.33, size * 0.03, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.beginPath();
+                ctx.arc(size * 0.6, size * 0.33, size * 0.03, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Antenna
+                ctx.strokeStyle = 'white';
+                ctx.lineWidth = size * 0.015;
+                ctx.lineCap = 'round';
+                ctx.beginPath();
+                ctx.moveTo(size/2, headY - size * 0.05);
+                ctx.lineTo(size/2, headY);
+                ctx.stroke();
+
+                ctx.fillStyle = '#F59E0B';
+                ctx.beginPath();
+                ctx.arc(size/2, headY - size * 0.05, size * 0.025, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Mouth/Code
+                ctx.fillStyle = '#8B5CF6';
+                ctx.font = `bold ${size * 0.08}px monospace`;
+                ctx.textAlign = 'center';
+                ctx.fillText('</>', size/2, headY + headSize * 0.7);
+
+                // Body
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+                const bodyWidth = size * 0.22;
+                const bodyHeight = size * 0.27;
+                const bodyX = size/2 - bodyWidth/2;
+                const bodyY = size * 0.51;
+                roundRect(ctx, bodyX, bodyY, bodyWidth, bodyHeight, 8);
+                ctx.fill();
+
+                // Code lines on body
+                const lineY = bodyY + size * 0.06;
+                ctx.strokeStyle = '#8B5CF6';
+                ctx.lineWidth = size * 0.012;
+                ctx.beginPath();
+                ctx.moveTo(bodyX + size * 0.04, lineY);
+                ctx.lineTo(bodyX + bodyWidth - size * 0.04, lineY);
+                ctx.stroke();
+
+                ctx.strokeStyle = '#EC4899';
+                ctx.beginPath();
+                ctx.moveTo(bodyX + size * 0.04, lineY + size * 0.06);
+                ctx.lineTo(bodyX + bodyWidth - size * 0.02, lineY + size * 0.06);
+                ctx.stroke();
+
+                ctx.strokeStyle = '#F59E0B';
+                ctx.beginPath();
+                ctx.moveTo(bodyX + size * 0.04, lineY + size * 0.12);
+                ctx.lineTo(bodyX + bodyWidth - size * 0.06, lineY + size * 0.12);
+                ctx.stroke();
+
+                // Arms
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+                roundRect(ctx, size * 0.27, size * 0.55, size * 0.08, size * 0.16, 5);
+                ctx.fill();
+                roundRect(ctx, size * 0.65, size * 0.55, size * 0.08, size * 0.16, 5);
+                ctx.fill();
+
+                // Convert to image
+                const img = document.createElement('img');
+                img.src = canvas.toDataURL('image/png');
+                img.alt = `Icon ${size}x${size}`;
+                img.title = `Sağ tıklayıp "icon-${size}x${size}.png" olarak kaydedin`;
+                img.style.width = Math.min(size, 150) + 'px';
+
+                const container = document.createElement('div');
+                container.style.display = 'inline-block';
+                container.style.margin = '10px';
+                container.style.textAlign = 'center';
+
+                const label = document.createElement('p');
+                label.textContent = `${size}x${size}`;
+                label.style.margin = '5px';
+                label.style.fontSize = '12px';
+
+                const downloadBtn = document.createElement('button');
+                downloadBtn.textContent = '⬇️ İndir';
+                downloadBtn.style.fontSize = '12px';
+                downloadBtn.style.padding = '5px 10px';
+                downloadBtn.onclick = () => downloadIcon(canvas, size);
+
+                container.appendChild(img);
+                container.appendChild(label);
+                container.appendChild(downloadBtn);
+                preview.appendChild(container);
+            });
+        }
+
+        function roundRect(ctx, x, y, width, height, radius) {
+            ctx.beginPath();
+            ctx.moveTo(x + radius, y);
+            ctx.lineTo(x + width - radius, y);
+            ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+            ctx.lineTo(x + width, y + height - radius);
+            ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+            ctx.lineTo(x + radius, y + height);
+            ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+            ctx.lineTo(x, y + radius);
+            ctx.quadraticCurveTo(x, y, x + radius, y);
+            ctx.closePath();
+        }
+
+        function downloadIcon(canvas, size) {
+            const link = document.createElement('a');
+            link.download = `icon-${size}x${size}.png`;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        }
+    </script>
+</body>
+</html>
