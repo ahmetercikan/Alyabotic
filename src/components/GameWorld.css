@@ -35,8 +35,24 @@
   animation: pulse 1s ease-in-out infinite;
 }
 
-.grid-cell.demon {
+.grid-cell.object-demon {
   background: linear-gradient(135deg, #DC2626 0%, #7F1D1D 100%);
+}
+
+.grid-cell.object-treasure {
+  background: linear-gradient(135deg, #FBBF24 0%, #F59E0B 100%);
+}
+
+.grid-cell.object-door {
+  background: linear-gradient(135deg, #34D399 0%, #059669 100%);
+}
+
+.grid-cell.object-obstacle {
+  background: linear-gradient(135deg, #6B7280 0%, #374151 100%);
+}
+
+.grid-cell.object-bridge {
+  background: linear-gradient(135deg, #60A5FA 0%, #3B82F6 100%);
 }
 
 @keyframes pulse {
@@ -84,6 +100,33 @@
 .mission p {
   margin: 5px 0;
   color: #E9D5FF;
+}
+
+.object-counts {
+  display: flex;
+  gap: 12px;
+  margin: 10px 0;
+  flex-wrap: wrap;
+}
+
+.object-counts span {
+  background: rgba(0, 0, 0, 0.3);
+  padding: 5px 10px;
+  border-radius: 5px;
+  font-size: 1rem;
+  font-weight: bold;
+  color: #FCD34D;
+}
+
+.level-hint {
+  font-size: 0.9rem;
+  font-weight: bold;
+  color: #A78BFA;
+}
+
+.object-sprite {
+  font-size: 2.5rem;
+  animation: bounce 0.5s ease-in-out;
 }
 
 @media (max-width: 768px) {
