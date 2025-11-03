@@ -1,0 +1,42 @@
+.level-system {
+  margin-top: 30px;
+  text-align: center;
+}
+
+.level-info {
+  background: rgba(139, 92, 246, 0.2);
+  padding: 20px;
+  border-radius: 15px;
+  border: 2px solid #8B5CF6;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.level-info h3 {
+  color: #C4B5FD;
+  margin-bottom: 15px;
+  font-size: 1.5rem;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 30px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 15px;
+  overflow: hidden;
+  border: 2px solid #8B5CF6;
+  margin-bottom: 10px;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #10B981 0%, #059669 50%, #10B981 100%);
+  transition: width 0.5s ease;
+  border-radius: 15px;
+  box-shadow: 0 0 10px #10B981;
+}
+
+.level-info p {
+  color: #E9D5FF;
+  font-size: 1.1rem;
+}

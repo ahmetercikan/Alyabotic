@@ -1,0 +1,16 @@
+.character {
+  position: absolute;
+  font-size: 3rem;
+  transition: all 0.5s ease;
+  z-index: 10;
+  animation: float 2s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
