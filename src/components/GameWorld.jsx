@@ -4,7 +4,13 @@ import './GameWorld.css'
 const GameWorld = ({ characterPosition, level, theme, collectedObjects = [] }) => {
   const [objects, setObjects] = useState([])
   const [collectingAt, setCollectingAt] = useState(null)
+  const [animationKey, setAnimationKey] = useState(0)
   const gridSize = 5
+
+  // Trigger animation when character position changes
+  useEffect(() => {
+    setAnimationKey(prev => prev + 1)
+  }, [characterPosition])
 
   useEffect(() => {
     // Generate random objects based on level and theme
@@ -58,7 +64,14 @@ const GameWorld = ({ characterPosition, level, theme, collectedObjects = [] }) =
 
         if (isCharacter) {
           cellClass += ' character'
-          cellContent = <div className="character-sprite">{theme.character}</div>
+          cellContent = (
+            <div
+              key={animationKey}
+              className="character-sprite"
+            >
+              {theme.character}
+            </div>
+          )
         } else if (object) {
           cellClass += ` object-${object.type}`
           cellContent = <div className={`object-sprite ${object.type}-sprite`}>{object.emoji}</div>

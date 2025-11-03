@@ -174,15 +174,16 @@ function App() {
     for (let i = 0; i < expandedCommands.length; i++) {
       const command = expandedCommands[i]
       setCurrentCommandIndex(i)
-      await new Promise(resolve => setTimeout(resolve, 600))
 
       const result = await executeCommand(command, { x: newX, y: newY }, i)
       newX = result.x
       newY = result.y
 
-      if (result.shouldAnimate) {
-        setCharacterPosition({ x: newX, y: newY })
-      }
+      // Always update character position to show movement
+      setCharacterPosition({ x: newX, y: newY })
+
+      // Wait after each command to show the animation
+      await new Promise(resolve => setTimeout(resolve, 600))
     }
 
     setCurrentCommandIndex(-1)
