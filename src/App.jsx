@@ -4,8 +4,11 @@ import CodeBlocks from './components/CodeBlocks'
 import GameWorld from './components/GameWorld'
 import Character from './components/Character'
 import LevelSystem from './components/LevelSystem'
+import ThemeSelector from './components/ThemeSelector'
+import { themes } from './themes/themeConfig'
 
 function App() {
+  const [selectedTheme, setSelectedTheme] = useState(null)
   const [commands, setCommands] = useState([])
   const [isRunning, setIsRunning] = useState(false)
   const [characterPosition, setCharacterPosition] = useState({ x: 0, y: 0 })
@@ -26,10 +29,29 @@ function App() {
     setCommands([])
   }
 
+  const handleThemeSelect = (themeId) => {
+    setSelectedTheme(themeId)
+    setCommands([])
+    setCharacterPosition({ x: 0, y: 0 })
+    setScore(0)
+    setLevel(1)
+    setCollectedDemons(0)
+  }
+
+  const handleChangeTheme = () => {
+    setSelectedTheme(null)
+    setCommands([])
+    setCharacterPosition({ x: 0, y: 0 })
+    setScore(0)
+    setLevel(1)
+    setCollectedDemons(0)
+  }
+
   const executeCommand = async (command, position, commandIndex) => {
     let newX = position.x
     let newY = position.y
     let shouldAnimate = true
+    const theme = themes[selectedTheme]
 
     switch(command.type) {
       case 'move-up':
@@ -45,7 +67,11 @@ function App() {
         newX = Math.min(4, newX + 1)
         break
       case 'jump':
-        // Jump 2 steps in the last direction or forward
+      case 'warp-jump':
+      case 'submarine':
+      case 'tree-climb':
+      case 'factory-reset':
+        // Jump/teleport 2 steps
         if (commandIndex > 0) {
           const lastCmd = commands[commandIndex - 1]
           if (lastCmd.type === 'move-up') newY = Math.max(0, newY - 2)
@@ -54,38 +80,20 @@ function App() {
           else if (lastCmd.type === 'move-right') newX = Math.min(4, newX + 2)
         }
         break
-      case 'catch-demon':
-        setScore(prev => prev + 10)
-        setCollectedDemons(prev => prev + 1)
-        shouldAnimate = false
-        break
-      case 'cast-spell':
-        setScore(prev => prev + 5)
-        shouldAnimate = false
-        break
-      case 'collect-treasure':
-        setScore(prev => prev + 20)
-        shouldAnimate = false
-        break
-      case 'open-door':
-        setScore(prev => prev + 15)
-        shouldAnimate = false
-        break
-      case 'build-bridge':
-        setScore(prev => prev + 25)
-        shouldAnimate = false
-        break
       case 'teleport':
         newX = 2
         newY = 2
         break
-      case 'create-light':
-        setScore(prev => prev + 8)
-        shouldAnimate = false
-        break
-      case 'destroy-obstacle':
-        setScore(prev => prev + 12)
-        shouldAnimate = false
+      default:
+        // Handle all theme-specific actions dynamically
+        const action = [...theme.actions, ...theme.special].find(a => a.type === command.type)
+        if (action) {
+          setScore(prev => prev + action.points)
+          if (action.points > 0) {
+            setCollectedDemons(prev => prev + 1)
+          }
+          shouldAnimate = false
+        }
         break
     }
 
@@ -148,24 +156,46 @@ function App() {
     setIsRunning(false)
   }
 
+  if (!selectedTheme) {
+    return <ThemeSelector onSelectTheme={handleThemeSelect} />
+  }
+
+  const currentTheme = themes[selectedTheme]
+
   return (
-    <div className="app">
-      <header className="app-header">
-        <h1 className="app-title">🔮 ALYABOTIC 🔮</h1>
-        <p className="app-subtitle">İblis Avcısı Kodlama Macerası</p>
+    <div className="app" style={{ background: currentTheme.background }}>
+      <header className="app-header" style={{ borderColor: currentTheme.primaryColor }}>
+        <h1 className="app-title">🎮 ALYABOTIC 🎮</h1>
+        <p className="app-subtitle">{currentTheme.name}</p>
         <div className="stats">
-          <div className="stat">⭐ Puan: {score}</div>
-          <div className="stat">🎯 Seviye: {level}</div>
-          <div className="stat">👹 İblis: {collectedDemons}</div>
+          <div className="stat" style={{ borderColor: currentTheme.secondaryColor }}>
+            ⭐ Puan: {score}
+          </div>
+          <div className="stat" style={{ borderColor: currentTheme.secondaryColor }}>
+            🎯 Seviye: {level}
+          </div>
+          <div className="stat" style={{ borderColor: currentTheme.secondaryColor }}>
+            {currentTheme.character} Toplanan: {collectedDemons}
+          </div>
+          <button
+            className="theme-change-btn"
+            onClick={handleChangeTheme}
+            style={{
+              background: `linear-gradient(135deg, ${currentTheme.primaryColor} 0%, ${currentTheme.secondaryColor} 100%)`
+            }}
+          >
+            🔄 Tema Değiştir
+          </button>
         </div>
       </header>
 
       <div className="game-container">
-        <div className="left-panel">
-          <h2>🎮 Oyun Dünyası</h2>
+        <div className="left-panel" style={{ borderColor: currentTheme.primaryColor }}>
+          <h2 style={{ color: currentTheme.secondaryColor }}>🎮 Oyun Dünyası</h2>
           <GameWorld
             characterPosition={characterPosition}
             level={level}
+            theme={currentTheme}
           />
           <div className="controls">
             <button
@@ -185,11 +215,12 @@ function App() {
           </div>
         </div>
 
-        <div className="right-panel">
-          <h2>🧩 Kod Blokları</h2>
+        <div className="right-panel" style={{ borderColor: currentTheme.primaryColor }}>
+          <h2 style={{ color: currentTheme.secondaryColor }}>🧩 Kod Blokları</h2>
           <CodeBlocks
             onAddCommand={handleAddCommand}
             disabled={isRunning}
+            theme={currentTheme}
           />
 
           <h2>📜 Komut Listesi</h2>

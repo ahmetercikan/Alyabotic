@@ -1,30 +1,22 @@
 import { useState, useEffect } from 'react'
 import './GameWorld.css'
 
-const GameWorld = ({ characterPosition, level }) => {
+const GameWorld = ({ characterPosition, level, theme }) => {
   const [objects, setObjects] = useState([])
   const gridSize = 5
 
   useEffect(() => {
-    // Generate random objects based on level
+    // Generate random objects based on level and theme
     const newObjects = []
     const totalObjects = Math.min(level + 2, 8)
 
-    const objectTypes = [
-      { type: 'demon', emoji: '👹', weight: 3 },
-      { type: 'treasure', emoji: '💰', weight: 2 },
-      { type: 'door', emoji: '🚪', weight: 1 },
-      { type: 'obstacle', emoji: '🪨', weight: 2 },
-      { type: 'bridge', emoji: '🌉', weight: 1 },
-    ]
-
     for (let i = 0; i < totalObjects; i++) {
       // Weighted random selection
-      const totalWeight = objectTypes.reduce((sum, obj) => sum + obj.weight, 0)
+      const totalWeight = theme.objects.reduce((sum, obj) => sum + obj.weight, 0)
       let random = Math.random() * totalWeight
-      let selectedType = objectTypes[0]
+      let selectedType = theme.objects[0]
 
-      for (const objType of objectTypes) {
+      for (const objType of theme.objects) {
         random -= objType.weight
         if (random <= 0) {
           selectedType = objType
@@ -41,7 +33,7 @@ const GameWorld = ({ characterPosition, level }) => {
       })
     }
     setObjects(newObjects)
-  }, [level])
+  }, [level, theme])
 
   const renderGrid = () => {
     const grid = []
@@ -55,7 +47,7 @@ const GameWorld = ({ characterPosition, level }) => {
 
         if (isCharacter) {
           cellClass += ' character'
-          cellContent = <div className="character-sprite">🧙‍♀️</div>
+          cellContent = <div className="character-sprite">{theme.character}</div>
         } else if (object) {
           cellClass += ` object-${object.type}`
           cellContent = <div className={`object-sprite ${object.type}-sprite`}>{object.emoji}</div>
@@ -81,17 +73,16 @@ const GameWorld = ({ characterPosition, level }) => {
       <div className="grid">
         {renderGrid()}
       </div>
-      <div className="mission">
-        <h3>🎯 Görev</h3>
-        <p>Kodları çalıştırarak haritadaki objeleri topla!</p>
+      <div className="mission" style={{ borderColor: theme.primaryColor }}>
+        <h3 style={{ color: theme.secondaryColor }}>🎯 Görev</h3>
+        <p>{theme.mission}</p>
         <div className="object-counts">
-          {objectCounts.demon && <span>👹 x{objectCounts.demon}</span>}
-          {objectCounts.treasure && <span>💰 x{objectCounts.treasure}</span>}
-          {objectCounts.door && <span>🚪 x{objectCounts.door}</span>}
-          {objectCounts.obstacle && <span>🪨 x{objectCounts.obstacle}</span>}
-          {objectCounts.bridge && <span>🌉 x{objectCounts.bridge}</span>}
+          {Object.entries(objectCounts).map(([type, count]) => {
+            const obj = theme.objects.find(o => o.type === type)
+            return obj ? <span key={type}>{obj.emoji} x{count}</span> : null
+          })}
         </div>
-        <p className="level-hint">Seviye {level}</p>
+        <p className="level-hint" style={{ color: theme.secondaryColor }}>Seviye {level}</p>
       </div>
     </div>
   )
